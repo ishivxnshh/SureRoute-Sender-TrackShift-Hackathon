@@ -23,6 +23,8 @@ function bufferToBase64(buf: ArrayBuffer): string {
 interface UploadOptions {
   baseUrl?: string; // e.g. https://data-receiver.onrender.com
   transferMethod?: 'wifi' | 'bluetooth';
+  fileId?: string; // reuse to resume
+  resume?: boolean;
   onProgress?: (pct: number) => void;
 }
 
@@ -59,31 +61,56 @@ export async function uploadFileWithChunks(file: File, attrs: FileAttributes, op
   const fullBuf = await file.arrayBuffer();
   const fullHash = await sha256(fullBuf);
 
-  // Client-generated fileId for this transfer
-  const fileId =
+  // Determine fileId (new or resume)
+  let fileId =
+    options?.fileId ||
     (crypto as any).randomUUID?.() ||
     `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 
-  // 1) Initialize transfer
-  const initRes = await fetch(`${baseUrl}/api/transfer/init`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      fileId,
-      fileName: file.name,
-      fileSize: file.size,
-      totalChunks,
-      mimeType: file.type || 'application/octet-stream',
-      transferMethod
-    })
-  });
-
-  if (!initRes.ok) {
-    throw new Error(`Receiver init failed with status ${initRes.status}`);
+  // If resuming, ask receiver which chunks it already has
+  let alreadyHave: Set<number> = new Set();
+  if (options?.resume && options.fileId) {
+    const transfersRes = await fetch(`${baseUrl}/api/transfers`);
+    if (transfersRes.ok) {
+      const transfers = (await transfersRes.json()) as any[];
+      const existing = transfers.find((t) => t.fileId === options.fileId);
+      if (existing && Array.isArray(existing.chunksReceived)) {
+        alreadyHave = new Set<number>(existing.chunksReceived);
+        fileId = existing.fileId;
+      }
+    }
   }
 
-  // 2) Upload chunks sequentially
+  // If not resuming or no existing transfer was found, initialize a new one
+  if (!options?.resume || alreadyHave.size === 0) {
+    const initRes = await fetch(`${baseUrl}/api/transfer/init`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileId,
+        fileName: file.name,
+        fileSize: file.size,
+        totalChunks,
+        mimeType: file.type || 'application/octet-stream',
+        transferMethod
+      })
+    });
+
+    if (!initRes.ok) {
+      throw new Error(`Receiver init failed with status ${initRes.status}`);
+    }
+  }
+
+  // 2) Upload chunks sequentially (skipping ones the receiver already has)
   for (let i = 0; i < totalChunks; i += 1) {
+    if (alreadyHave.has(i)) {
+      if (onProgress) {
+        const pct = Math.round(((i + 1) / (totalChunks + 2)) * 100);
+        onProgress(Math.min(100, pct));
+      }
+      continue;
+    }
+
     const buf = chunkBuffers[i];
     const body = {
       fileId,

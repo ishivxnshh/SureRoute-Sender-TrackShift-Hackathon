@@ -22,6 +22,7 @@ export default function Inspector({ selected }: InspectorProps) {
       uploading: boolean;
       progress: number;
       error?: string;
+      fileId?: string;
     }[]
   >([]);
 
@@ -70,6 +71,8 @@ export default function Inspector({ selected }: InspectorProps) {
       const manifest = await uploadFileWithChunks(entry.file, entry.attrs, {
         baseUrl: RECEIVER_BASE_URL,
         transferMethod: 'wifi',
+        fileId: entry.fileId,
+        resume: !!entry.fileId,
         onProgress: (pct) => {
           setPendingFiles((prev) => prev.map((p) => (p.id === id ? { ...p, progress: pct } : p)));
         }
@@ -80,7 +83,11 @@ export default function Inspector({ selected }: InspectorProps) {
           8
         )}…`
       );
-      setPendingFiles((prev) => prev.filter((p) => p.id !== id));
+      setPendingFiles((prev) =>
+        prev
+          .map((p) => (p.id === id ? { ...p, fileId: manifest.fileId } : p))
+          .filter((p) => p.id !== id)
+      );
     } catch (err: any) {
       const msg = err?.message || 'Upload failed';
       addActivity(`Upload error for ${entry.file.name}: ${msg}`);
