@@ -10,8 +10,10 @@ export default function TransferCard({ id }: { id: string }) {
   const badgeClass = t.priority === 'high' ? 'badge-high' : t.priority === 'medium' ? 'badge-medium' : 'badge-low';
   return (
     <div className="transfer-card cursor-pointer" onClick={() => select(id)}>
-      <div className="flex items-center justify-between">
-        <div className="font-semibold">{t.fileName}</div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="font-semibold flex-1 min-w-0 truncate" title={t.fileName}>
+          {t.fileName}
+        </div>
         <div className={`badge ${badgeClass}`}>{t.priority}</div>
       </div>
       <div className="text-xs text-gray-400 mt-1">{(t.size / (1024 * 1024)).toFixed(1)} MB</div>

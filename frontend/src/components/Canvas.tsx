@@ -7,6 +7,8 @@ import ReactFlow, {
   Connection,
   Edge,
   Node,
+  NodeChange,
+  EdgeChange,
   ReactFlowInstance,
   useEdgesState,
   useNodesState
@@ -51,14 +53,14 @@ function CanvasInner({ workflow, onSelect, transfers, onChange }: CanvasProps) {
   }, [nodes, edges, onChange]);
 
   const handleNodesChange = useCallback(
-    (changes) => {
+    (changes: NodeChange[]) => {
       onNodesChange(changes);
     },
     [onNodesChange]
   );
 
   const handleEdgesChange = useCallback(
-    (changes) => {
+    (changes: EdgeChange[]) => {
       onEdgesChange(changes);
     },
     [onEdgesChange]
@@ -92,10 +94,9 @@ function CanvasInner({ workflow, onSelect, transfers, onChange }: CanvasProps) {
       event.preventDefault();
       const type = event.dataTransfer.getData('application/reactflow');
       if (!type || !rfInstance) return;
-      const bounds = reactFlowWrapper.current?.getBoundingClientRect();
-      const position = rfInstance.project({
-        x: event.clientX - (bounds?.left ?? 0),
-        y: event.clientY - (bounds?.top ?? 0)
+      const position = rfInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY
       });
       const id = `node-${nodeId.current++}`;
       const newNode: Node = {
