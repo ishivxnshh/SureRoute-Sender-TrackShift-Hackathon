@@ -1,0 +1,14 @@
+{
+  "name": "sureroute-tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "send": "node send_file.js",
+    "resume": "node resume_test.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.4",
+    "commander": "^12.1.0"
+  }
+}
