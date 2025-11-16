@@ -1,0 +1,76 @@
+.priority-lane {
+  background: rgba(26, 31, 58, 0.5);
+  border: 2px solid #2d3655;
+  border-left: 4px solid;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+  min-height: 150px;
+}
+
+.priority-lane.drag-over {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.lane-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #2d3655;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lane-label {
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lane-count {
+  font-size: 12px;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.lane-content {
+  padding: 16px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.lane-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.lane-empty p {
+  font-size: 13px;
+  margin: 0;
+}
+
+.transfers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 1400px) {
+  .transfers-grid {
+    grid-template-columns: 1fr;
+  }
+}

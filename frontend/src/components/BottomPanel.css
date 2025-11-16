@@ -1,0 +1,269 @@
+.bottom-panel {
+  height: 200px;
+  background: #0f1629;
+  border-top: 1px solid #2d3655;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 1px;
+  background: #2d3655;
+}
+
+.bottom-left,
+.bottom-center,
+.bottom-right {
+  background: #0f1629;
+  padding: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2d3655;
+}
+
+.toggle-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px;
+}
+
+.toggle-btn:hover {
+  color: #94a3b8;
+}
+
+.activity-feed {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.activity-entry {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  background: #1a1f3a;
+  border-left: 2px solid;
+  border-radius: 4px;
+  font-size: 12px;
+  animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.activity-entry.entry-info {
+  border-left-color: #3b82f6;
+}
+
+.activity-entry.entry-success {
+  border-left-color: #4ade80;
+}
+
+.activity-entry.entry-warning {
+  border-left-color: #fbbf24;
+}
+
+.activity-entry.entry-error {
+  border-left-color: #ef4444;
+}
+
+.activity-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activity-message {
+  color: #e8eaed;
+  line-height: 1.4;
+}
+
+.activity-time {
+  color: #64748b;
+  font-size: 10px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.metric-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #1a1f3a;
+  border: 1px solid #2d3655;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.metric-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.metric-info {
+  flex: 1;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e8eaed;
+}
+
+.simulator-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.simulator-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.simulator-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.simulator-row input[type="range"] {
+  width: 100%;
+  height: 4px;
+  background: #2d3655;
+  border: none;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.simulator-row input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #667eea;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.simulator-row input[type="range"]::-webkit-slider-thumb:hover {
+  background: #7c8ef6;
+  transform: scale(1.2);
+}
+
+.simulator-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sim-btn {
+  flex: 1;
+  padding: 6px 10px;
+  background: #1a1f3a;
+  border: 1px solid #2d3655;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+  min-width: fit-content;
+}
+
+.sim-btn:hover {
+  background: #1f2642;
+  border-color: #667eea;
+  color: #e8eaed;
+}
+
+.sim-btn.danger {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.sim-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+.sim-btn.warning {
+  border-color: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
+
+.sim-btn.warning:hover {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: #fbbf24;
+}
+
+.real-mode-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: 8px;
+  color: #4ade80;
+  font-size: 12px;
+  font-weight: 500;
+}

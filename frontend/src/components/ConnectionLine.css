@@ -1,0 +1,116 @@
+.connection-line {
+  pointer-events: none;
+}
+
+.connection-path-shadow {
+  stroke: rgba(0, 0, 0, 0.2);
+  opacity: 0.5;
+}
+
+.connection-path {
+  stroke: var(--accent-primary);
+  transition: stroke 0.3s;
+  stroke-dasharray: 8 4;
+  animation: dashFlow 20s linear infinite;
+}
+
+.connection-line.temporary .connection-path {
+  stroke: var(--text-tertiary);
+  stroke-dasharray: 6 3;
+  animation: dashFlow 1s linear infinite;
+  opacity: 0.6;
+}
+
+.connection-line.active .connection-path {
+  stroke: var(--accent-primary);
+  stroke-width: 2.5;
+  animation: dashFlowActive 15s linear infinite, connectionPulse 2s ease-in-out infinite;
+}
+
+@keyframes dashFlow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes dashFlowActive {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes connectionPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.connection-arrow {
+  stroke: var(--accent-primary);
+  fill: var(--accent-primary);
+  transition: all 0.3s;
+  opacity: 0.9;
+}
+
+.connection-line.active .connection-arrow {
+  stroke: var(--accent-primary);
+  fill: var(--accent-primary);
+  opacity: 1;
+}
+
+.connection-line.executing .connection-arrow {
+  stroke: var(--success);
+  fill: var(--success);
+  animation: arrowPulse 1s ease-in-out infinite;
+}
+
+@keyframes arrowPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+.connection-dot {
+  fill: var(--success);
+  filter: drop-shadow(0 0 4px var(--success));
+}
+
+.connection-dot-glow {
+  fill: var(--success);
+  opacity: 0.3;
+  animation: glowPulse 1s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "name": "sureroute",
+  "version": "1.0.0",
+  "description": "Resilient file transfer system with AI-powered optimization and multi-transport support",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "relay-server"
+  ],
+  "scripts": {
+    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install && cd ../relay-server && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:relay\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:relay": "cd relay-server && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:relay\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "start:relay": "cd relay-server && npm start",
+    "start:frontend": "cd frontend && npm start"
+  },
+  "keywords": [
+    "file-transfer",
+    "resilient",
+    "ai",
+    "multi-transport",
+    "p2p"
+  ],
+  "author": "KKY Brothers",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

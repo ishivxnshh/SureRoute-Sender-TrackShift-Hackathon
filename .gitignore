@@ -1,26 +1,60 @@
-node_modules
-dist
-.DS_Store
-*.log
-tmp
-*.tmp
-**/.vite
-**/.eslintcache
-**/.parcel-cache
-**/.turbo
-**/.cache
-**/.next
-**/coverage
-**/.env
-**/.env.local
-backend/data/chunks/**
-backend/data/transfers/**
-backend/data/assembled/**
-frontend/node_modules/**
-backend/node_modules/**
-agents/monitor/node_modules/**
-agents/scheduler/node_modules/**
-relay/node_modules/**
-simulator/node_modules/**
-tests/node_modules/**
+# Dependencies
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
+# Build outputs
+dist/
+build/
+*.local
+
+# Storage directories
+storage/
+relay-storage/
+backend/storage/
+backend/relay-storage/
+relay-server/relay-storage/
+
+# Chunks and temp files
+chunks/
+*.chunk
+temp/
+tmp/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Production
+*.tgz
+*.zip
+
+# Debug
+.vscode-test/
+*.cpuprofile
+*.heapprofile

@@ -1,0 +1,222 @@
+.workflow-canvas-container {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-canvas);
+  position: relative;
+}
+
+/* Toolbar */
+.canvas-toolbar {
+  height: 56px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 16px;
+  z-index: 10;
+}
+
+.toolbar-left,
+.toolbar-center,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workflow-name-container {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+}
+
+.workflow-name-input {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  min-width: 250px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.workflow-name-input:focus {
+  border-color: var(--accent-primary);
+  background: var(--bg-primary);
+}
+
+.workflow-name-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.toolbar-btn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-secondary);
+}
+
+.zoom-level {
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 50px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.execute-btn {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+.execute-btn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.execute-btn.executing {
+  background: var(--error);
+  border-color: var(--error);
+  animation: pulse 2s infinite;
+}
+
+.save-btn {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.save-btn:hover {
+  opacity: 0.9;
+}
+
+/* Canvas Content */
+.canvas-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Canvas */
+.workflow-canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  background: var(--bg-canvas);
+}
+
+.workflow-canvas.dragging {
+  cursor: grabbing;
+}
+
+.canvas-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle, var(--border-primary) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: 0 0;
+  z-index: 0;
+}
+
+.canvas-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Empty State */
+.canvas-empty-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.canvas-empty-state svg {
+  color: var(--text-tertiary);
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.canvas-empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+.canvas-empty-state p {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+/* Layers */
+.connections-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.connections-layer path {
+  vector-effect: non-scaling-stroke;
+}
+
+.nodes-layer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+/* Connection Mode */
+.workflow-canvas.connecting {
+  cursor: crosshair;
+}
+
+.workflow-canvas.connecting .node-handle.output-handle {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
+}
+
+.workflow-canvas.connecting .node-handle.input-handle:hover {
+  border-color: var(--success);
+  background: var(--success);
+}

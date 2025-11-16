@@ -1,0 +1,196 @@
+.transfer-card {
+  background: #1a1f3a;
+  border: 1px solid #2d3655;
+  border-left: 3px solid;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.transfer-card:hover {
+  background: #1f2642;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.transfer-card.dragging {
+  opacity: 0.5;
+  cursor: move;
+}
+
+.transfer-card.status-active {
+  border-left-width: 4px;
+}
+
+.transfer-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.transfer-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 20px;
+}
+
+.transfer-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.transfer-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #e8eaed;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+.transfer-size-inline {
+  font-size: 12px;
+  color: #64748b;
+  margin-left: 4px;
+}
+
+.transfer-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.transfer-priority {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid #2d3655;
+  background: #0b1120;
+  color: #e5e7eb;
+}
+
+.transfer-progress {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 12px 0;
+}
+
+.progress-ring-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle-bg {
+  fill: none;
+  stroke: #2d3655;
+  stroke-width: 4;
+}
+
+.progress-ring-circle {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: 600;
+  color: #e8eaed;
+}
+
+.transfer-stats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.stat-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.chunk-map-mini {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 2px;
+  margin-bottom: 12px;
+  height: 8px;
+}
+
+.chunk-mini {
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.transfer-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.transfer-action-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #2d3655;
+  border-radius: 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.transfer-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e8eaed;
+  border-color: #667eea;
+}
+
+.transfer-action-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.agent-indicator {
+  margin-left: auto;
+  font-size: 20px;
+  opacity: 0.7;
+  cursor: help;
+}
+
+.agent-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}

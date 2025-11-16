@@ -1,22 +1,26 @@
 {
   "name": "sureroute-backend",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
+  "version": "1.0.0",
+  "description": "SureRoute backend - Transfer engine with AI agents",
   "main": "src/server.js",
+  "type": "module",
   "scripts": {
+    "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "generate-test-data": "node src/generate-test-data.js"
   },
   "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
     "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "mkdirp": "^3.0.1",
-    "node-fetch": "^3.3.2",
-    "socket.io": "^4.7.5",
-    "uuid": "^9.0.1"
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.0",
+    "redis": "^4.6.5"
+  },
+  "optionalDependencies": {
+    "wrtc": "^0.4.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.0.1"
   }
 }
