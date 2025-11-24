@@ -1,60 +1,118 @@
-# Dependencies
+############################
+## Core dependencies / Node
+############################
 node_modules/
 **/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Build outputs
+# Package manager caches
+.npm/
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+#####################
+## Build artefacts
+#####################
 dist/
+**/dist/
 build/
+**/build/
+
+# Vite / bundler
+.vite/
+.turbo/
+
+# Generic local-only config
 *.local
 
-# Storage directories
-storage/
-relay-storage/
-backend/storage/
-backend/relay-storage/
-relay-server/relay-storage/
-
-# Chunks and temp files
-chunks/
-*.chunk
+########################
+## Runtime / temp data
+########################
 temp/
 tmp/
+*.tmp
+*.temp
 
-# Environment variables
+# PID files
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+#############################
+## Project storage directories
+#############################
+# Root / shared
+storage/
+relay-storage/
+
+# Backend storage (Mongo/file chunks, uploads, etc.)
+backend/storage/
+backend/relay-storage/
+
+# Relay server storage
+relay-server/relay-storage/
+
+# Generic chunked data
+chunks/
+*.chunk
+
+############################
+## Environment / secrets
+############################
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
 
-# IDE
+####################
+## IDE / editor
+####################
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-.DS_Store
+.vscode-test/
 
-# Logs
+########################
+## Logs & diagnostics
+########################
 logs/
+**/logs/
 *.log
+*.log.*
 
-# OS
-Thumbs.db
-.DS_Store
+# Profiling
+*.cpuprofile
+*.heapprofile
 
-# Test coverage
+################
+## Test output
+################
 coverage/
+**/coverage/
 .nyc_output/
 
-# Production
+############
+## Archives
+############
 *.tgz
 *.zip
 
-# Debug
-.vscode-test/
-*.cpuprofile
-*.heapprofile
+#########
+## OS
+#########
+Thumbs.db
+.DS_Store
+
+

@@ -1,19 +1,33 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
-import { Plus, Folder, Clock, Play, Trash2, Edit2, Copy } from 'lucide-react';
+import { Plus, Folder, Clock, Trash2, Edit2 } from 'lucide-react';
 import './HomePage.css';
 
+const BACKEND_BASE =
+  import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:5000';
+
 function HomePage() {
-  const { workflows, createWorkflow, deleteWorkflow, setActiveWorkflow, theme, toggleTheme } = useStore();
+  const { 
+    workflows, 
+    createWorkflow, 
+    deleteWorkflow, 
+    setActiveWorkflow, 
+    theme, 
+    toggleTheme,
+    user,
+    signup,
+    login,
+    logout,
+    authError,
+    isAuthLoading,
+  } = useStore();
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newWorkflowName, setNewWorkflowName] = useState('');
   const [newWorkflowDesc, setNewWorkflowDesc] = useState('');
-
-
-  console.log('=== HomePage Render ===');
-  console.log('Workflows:', workflows);
-  console.log('Current theme:', theme);
-  console.log('=======================');
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleCreateWorkflow = () => {
     if (newWorkflowName.trim()) {
@@ -21,6 +35,16 @@ function HomePage() {
       setNewWorkflowName('');
       setNewWorkflowDesc('');
       setShowCreateModal(false);
+    }
+  };
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
+    if (authMode === 'login') {
+      await login(email, password);
+    } else {
+      await signup(email, password);
     }
   };
 
@@ -38,43 +62,67 @@ function HomePage() {
 
   return (
     <div className="home-page">
-      {/* Theme Toggle Button - Always Visible */}
-      <button 
-        onClick={toggleTheme}
-        style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          zIndex: 9999,
-          background: 'var(--accent-primary)',
-          color: 'white',
-          padding: '12px',
-          borderRadius: '8px',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '14px',
-          fontWeight: '500',
-          boxShadow: 'var(--shadow-lg)',
-        }}
-      >
-        {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
-      </button>
-
       {/* Header */}
       <div className="home-header">
         <div className="home-header-content">
           <div className="home-title-section">
             <Folder className="home-icon" size={32} />
             <div>
-              <h1>Your Workflows</h1>
-              <p>Build and manage resilient file transfer workflows</p>
+              <h1>SureRoute Workflows</h1>
+              <p>Design and manage resilient SureRoute file transfer workflows</p>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            {user && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'var(--card-bg)',
+                  padding: '8px 12px',
+                  borderRadius: '999px',
+                  fontSize: '13px',
+                }}
+              >
+                <span style={{ opacity: 0.8 }}>Signed in as</span>
+                <span style={{ fontWeight: 600 }}>{user.email}</span>
+                <button
+                  onClick={logout}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: 'var(--accent-primary)',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+            <button
+              onClick={toggleTheme}
+              style={{
+                background: 'var(--bg-elevated)',
+                color: 'var(--text-primary)',
+                padding: '8px 12px',
+                borderRadius: '999px',
+                border: '1px solid var(--border-subtle)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}
+            >
+              {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+            </button>
+            <button 
+              className="btn-primary" 
+              onClick={() => setShowCreateModal(true)}
+            >
               <Plus size={20} />
               New Workflow
             </button>
@@ -82,13 +130,145 @@ function HomePage() {
         </div>
       </div>
 
+      {/* Auth card when not logged in */}
+      {!user && (
+        <div
+          style={{
+            maxWidth: '420px',
+            margin: '0 auto 24px',
+            padding: '20px 24px',
+            borderRadius: '16px',
+            background: 'var(--card-bg)',
+            boxShadow: 'var(--shadow-md)',
+          }}
+        >
+          <h2 style={{ margin: '0 0 12px', fontSize: '18px' }}>
+            {authMode === 'login' ? 'Log in to save your workflows' : 'Create an account'}
+          </h2>
+          <p style={{ margin: '0 0 16px', fontSize: '13px', opacity: 0.8 }}>
+            You can build workflows as a guest, but they will only be saved to your profile and available across sessions once you log in or create an account.
+          </p>
+          <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            </div>
+            {authError && (
+              <div
+                style={{
+                  fontSize: '12px',
+                  color: '#ff6b6b',
+                  marginTop: '4px',
+                }}
+              >
+                {authError}
+              </div>
+            )}
+            <button
+              className="btn-primary"
+              type="submit"
+              disabled={isAuthLoading}
+              style={{ marginTop: '8px' }}
+            >
+              {isAuthLoading
+                ? authMode === 'login'
+                  ? 'Logging in...'
+                  : 'Signing up...'
+                : authMode === 'login'
+                ? 'Log In'
+                : 'Sign Up'}
+            </button>
+            <div
+              style={{
+                marginTop: '10px',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = `${BACKEND_BASE}/auth/google`;
+                }}
+                style={{
+                  borderRadius: '999px',
+                  padding: '8px 14px',
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-elevated)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                }}
+              >
+                <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  alt="Google logo"
+                  style={{ width: 16, height: 16 }}
+                />
+                <span>Continue with Google</span>
+              </button>
+            </div>
+          </form>
+          <div
+            style={{
+              marginTop: '10px',
+              fontSize: '12px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span>
+              {authMode === 'login' ? "Don't have an account?" : 'Already have an account?'}
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                setAuthMode((prev) => (prev === 'login' ? 'signup' : 'login'))
+              }
+              style={{
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--accent-primary)',
+                cursor: 'pointer',
+                fontWeight: 500,
+              }}
+            >
+              {authMode === 'login' ? 'Sign up' : 'Log in'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Workflows Grid */}
       <div className="workflows-container">
         {workflows.length === 0 ? (
           <div className="empty-state">
             <Folder size={64} className="empty-icon" />
             <h2>No workflows yet</h2>
-            <p>Create your first file transfer workflow to get started</p>
+            <p>
+              {user
+                ? 'Create your first file transfer workflow to get started.'
+                : 'Start building a workflow as a guest. To save it to your profile for later, create an account or log in.'}
+            </p>
             <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
               <Plus size={20} />
               Create Workflow

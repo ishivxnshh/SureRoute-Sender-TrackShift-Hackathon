@@ -8,10 +8,15 @@ import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createDiscovery } from './discovery/index.js';
+import dotenv from 'dotenv';
 import { AgentCoordinator } from './agents.js';
 import { P2PManager } from './p2p-manager.js';
 import { BluetoothManager } from './bluetooth-manager.js';
+import { authMiddleware } from './utils/jwt.js';
+import { getUserWorkflows, saveUserWorkflows } from './workflows.js';
+import { signup, login, me, logout, startGoogleOAuth, handleGoogleCallback } from './controllers/authController.js';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,10 +70,6 @@ function inferPriorityFromFile(fileName, fileSize) {
   return 'low';
 }
 
-// Initialize discovery (broadcast + listener) so this backend advertises and discovers peers
-const discovery = createDiscovery({ discoveryPort: 6000, servicePort: process.env.PORT || 5000, name: 'sureroute-backend' });
-discovery.start();
-
 // Initialize managers
 const agentCoordinator = new AgentCoordinator(io);
 const p2pManager = new P2PManager(io);
@@ -101,6 +102,55 @@ function generateTelemetry(transferId) {
   
   return base;
 }
+
+// ---------- Auth & Workflow persistence endpoints ----------
+
+// Local email/password auth (JSON API used by the React app)
+app.post('/api/auth/signup', signup);
+app.post('/api/auth/login', login);
+app.get('/api/auth/me', authMiddleware, me);
+app.post('/api/auth/logout', authMiddleware, logout);
+
+// Aliases matching the spec in the requirements
+app.get('/auth/me', authMiddleware, me);
+app.post('/auth/logout', authMiddleware, logout);
+
+// Google OAuth endpoints:
+//  - GET /auth/google           → redirect to Google
+//  - GET /auth/google/callback  → Google redirects back here with ?code=...
+//
+// The controller is heavily commented to explain:
+//   * how the redirect-based OAuth 2.0 flow works,
+//   * how we map Google identities into SureRoute users, and
+//   * how we mint our own JWT so the frontend talks ONLY to SureRoute.
+app.get('/auth/google', startGoogleOAuth);
+app.get('/auth/google/callback', handleGoogleCallback);
+
+// Get workflows for current user
+app.get('/api/workflows', authMiddleware, async (req, res) => {
+  try {
+    const workflows = await getUserWorkflows(req.userId);
+    res.json({ success: true, workflows });
+  } catch (err) {
+    console.error('Get workflows error:', err);
+    res.status(500).json({ success: false, error: 'Failed to load workflows' });
+  }
+});
+
+// Save workflows for current user (overwrites existing list)
+app.post('/api/workflows', authMiddleware, async (req, res) => {
+  try {
+    const { workflows } = req.body || {};
+    if (!Array.isArray(workflows)) {
+      return res.status(400).json({ success: false, error: 'workflows must be an array' });
+    }
+    await saveUserWorkflows(req.userId, workflows);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Save workflows error:', err);
+    res.status(500).json({ success: false, error: 'Failed to save workflows' });
+  }
+});
 
 // Start telemetry updates for active transfers
 setInterval(() => {
@@ -649,16 +699,6 @@ app.get('/api/network-info', async (req, res) => {
     port: 5000,
     hostname: os.hostname()
   });
-});
-
-// Discovery peers endpoint
-app.get('/api/discovery/peers', (req, res) => {
-  try {
-    const peers = discovery.getPeers();
-    res.json({ success: true, peers });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
 });
 
 // Start receiver

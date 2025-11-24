@@ -1,60 +1,124 @@
 import { create } from 'zustand';
+import { api, setAuthToken } from './services/api';
 
-// Load workflows from localStorage
-const loadWorkflowsFromStorage = () => {
-  try {
-    const savedWorkflows = localStorage.getItem('sureroute_workflows');
-    if (savedWorkflows) {
-      const parsed = JSON.parse(savedWorkflows);
-      // Drop any legacy workflows named "ABS"
-      const filtered = parsed.filter((wf) => wf.name !== 'ABS');
-      if (filtered.length !== parsed.length) {
-        localStorage.setItem('sureroute_workflows', JSON.stringify(filtered));
-      }
-      // Convert saved workflows to store format
-      return filtered.map((wf, index) => ({
-        id: `wf_saved_${Date.now()}_${index}`,
-        name: wf.name || `Workflow ${index + 1}`,
-        description: wf.description || 'Saved workflow',
-        nodes: wf.nodes || [],
-        connections: wf.connections || [],
-        status: 'idle',
-        createdAt: new Date(wf.savedAt).getTime() || Date.now(),
-        updatedAt: new Date(wf.savedAt).getTime() || Date.now(),
-      }));
-    }
-  } catch (error) {
-    console.error('Failed to load workflows from localStorage:', error);
-  }
-  return [];
-};
-
-// Initialize with demo workflows + saved workflows
+// Initialize with a single default workflow; once a user logs in we replace
+// this list with workflows loaded from MongoDB via the backend.
 const initialWorkflows = [
   {
-    id: 'wf_demo_1',
-    name: 'File Transfer Workflow',
-    description: 'High-priority file transfer with AI optimization',
+    id: 'wf_default_ab',
+    name: 'A-B Transfer',
+    description: 'Simple file transfer workflow from sender (A) to receiver (B)',
     nodes: [],
     connections: [],
     status: 'idle',
-    createdAt: Date.now() - 86400000,
-    updatedAt: Date.now() - 3600000,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   },
-  {
-    id: 'wf_demo_2',
-    name: 'Multi-Device Sync',
-    description: 'Sync files across multiple devices using P2P',
-    nodes: [],
-    connections: [],
-    status: 'idle',
-    createdAt: Date.now() - 172800000,
-    updatedAt: Date.now() - 7200000,
-  },
-  ...loadWorkflowsFromStorage()
 ];
 
 export const useStore = create((set, get) => ({
+  // Auth
+  user: null,
+  authToken: null,
+  authError: null,
+  isAuthLoading: false,
+
+  // Used when the app is loaded with ?authToken=... after Google OAuth
+  setAuthFromToken: async (token) => {
+    if (!token) return;
+    setAuthToken(token);
+    try {
+      const data = await api.getCurrentUser();
+      if (data?.user) {
+        set({
+          user: data.user,
+          authToken: token,
+        });
+        await get().loadUserWorkflows();
+      }
+    } catch (error) {
+      console.error('Failed to hydrate auth from token:', error);
+      setAuthToken(null);
+    }
+  },
+
+  signup: async (email, password) => {
+    set({ isAuthLoading: true, authError: null });
+    try {
+      const data = await api.signup(email, password);
+      if (data?.token) {
+        setAuthToken(data.token);
+      }
+      set({
+        user: data.user,
+        authToken: data.token,
+        isAuthLoading: false,
+      });
+      // Load any existing workflows for this user
+      await get().loadUserWorkflows();
+    } catch (error) {
+      console.error('Signup failed:', error);
+      const message = error?.response?.data?.error || 'Failed to sign up';
+      set({ authError: message, isAuthLoading: false });
+    }
+  },
+
+  login: async (email, password) => {
+    set({ isAuthLoading: true, authError: null });
+    try {
+      const data = await api.login(email, password);
+      if (data?.token) {
+        setAuthToken(data.token);
+      }
+      set({
+        user: data.user,
+        authToken: data.token,
+        isAuthLoading: false,
+      });
+      await get().loadUserWorkflows();
+    } catch (error) {
+      console.error('Login failed:', error);
+      const message = error?.response?.data?.error || 'Failed to log in';
+      set({ authError: message, isAuthLoading: false });
+    }
+  },
+
+  logout: async () => {
+    try {
+      await api.logout().catch(() => {});
+    } catch (e) {
+      // ignore network/logout errors
+    }
+    setAuthToken(null);
+    set({
+      user: null,
+      authToken: null,
+      authError: null,
+    });
+  },
+
+  loadUserWorkflows: async () => {
+    const { user } = get();
+    if (!user) return;
+    try {
+      const data = await api.getWorkflows();
+      if (Array.isArray(data?.workflows)) {
+        set({ workflows: data.workflows });
+      }
+    } catch (error) {
+      console.error('Failed to load workflows from server:', error);
+    }
+  },
+
+  syncWorkflowsToServer: async () => {
+    const { user, workflows } = get();
+    if (!user) return;
+    try {
+      await api.saveWorkflows(workflows);
+    } catch (error) {
+      console.error('Failed to save workflows to server:', error);
+    }
+  },
   // Theme
   theme: 'dark',
   toggleTheme: () => {
@@ -88,6 +152,8 @@ export const useStore = create((set, get) => ({
       currentView: 'workflow',
     }));
     get().loadWorkflowToCanvas(newWorkflow.id);
+    // Persist to server for logged-in user
+    get().syncWorkflowsToServer();
     return newWorkflow.id;
   },
 
@@ -97,15 +163,8 @@ export const useStore = create((set, get) => ({
       activeWorkflowId: state.activeWorkflowId === id ? null : state.activeWorkflowId,
       currentView: state.activeWorkflowId === id ? 'home' : state.currentView,
     }));
-
-    // Also remove from localStorage
-    try {
-      const savedWorkflows = JSON.parse(localStorage.getItem('sureroute_workflows') || '[]');
-      const updatedWorkflows = savedWorkflows.filter((w) => w.id !== id && w.name !== id);
-      localStorage.setItem('sureroute_workflows', JSON.stringify(updatedWorkflows));
-    } catch (error) {
-      console.error('Failed to delete workflow from localStorage:', error);
-    }
+    // Persist change for logged-in user
+    get().syncWorkflowsToServer();
   },
 
   setActiveWorkflow: (id) => {
@@ -136,32 +195,9 @@ export const useStore = create((set, get) => ({
         canvasPosition,
         canvasZoom,
       });
-
-      // Also update in localStorage so layout persists
-      try {
-        const activeWorkflow = workflows.find(w => w.id === activeWorkflowId);
-        const savedWorkflows = JSON.parse(localStorage.getItem('sureroute_workflows') || '[]');
-        const updatedWorkflows = savedWorkflows.map(w => {
-          if (
-            (activeWorkflow && w.name === activeWorkflow.name) ||
-            JSON.stringify(w.nodes) === JSON.stringify(canvasNodes)
-          ) {
-            return {
-              ...w,
-              nodes: canvasNodes,
-              connections: canvasConnections,
-              canvasPosition,
-              canvasZoom,
-              savedAt: new Date().toISOString(),
-            };
-          }
-          return w;
-        });
-        localStorage.setItem('sureroute_workflows', JSON.stringify(updatedWorkflows));
-      } catch (error) {
-        console.error('Failed to sync layout to localStorage:', error);
-      }
     }
+    // Persist latest workflows to server
+    get().syncWorkflowsToServer();
   },
 
   loadWorkflowToCanvas: (workflowId) => {
@@ -227,17 +263,6 @@ export const useStore = create((set, get) => ({
         if (state.activeWorkflowId === activeWorkflowId) {
           newActiveWorkflowId = null;
           newCurrentView = 'home';
-        }
-
-        // Also remove from localStorage
-        try {
-          const savedWorkflows = JSON.parse(localStorage.getItem('sureroute_workflows') || '[]');
-          const updatedWorkflows = savedWorkflows.filter(
-            (w) => w.id !== activeWorkflowId && w.name !== activeWorkflowId
-          );
-          localStorage.setItem('sureroute_workflows', JSON.stringify(updatedWorkflows));
-        } catch (error) {
-          console.error('Failed to delete workflow from localStorage after last node removed:', error);
         }
       }
 

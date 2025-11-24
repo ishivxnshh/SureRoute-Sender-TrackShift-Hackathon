@@ -151,68 +151,54 @@ const WorkflowCanvas = () => {
     e.dataTransfer.dropEffect = 'copy';
   };
 
-  // Handle workflow name change
+  // Handle workflow name change – updates the current workflow in Zustand + Mongo
   const handleWorkflowNameChange = (newName) => {
     setWorkflowName(newName);
     
     if (activeWorkflowId) {
       // Update in Zustand store
       updateWorkflow(activeWorkflowId, { name: newName });
-      
-      // Update in localStorage
+      // Persist update for logged-in users
       try {
-        const savedWorkflows = JSON.parse(localStorage.getItem('sureroute_workflows') || '[]');
-        const updatedWorkflows = savedWorkflows.map(w => {
-          if (w.name === currentWorkflow?.name || 
-              JSON.stringify(w.nodes) === JSON.stringify(canvasNodes)) {
-            return { ...w, name: newName, savedAt: new Date().toISOString() };
-          }
-          return w;
-        });
-        localStorage.setItem('sureroute_workflows', JSON.stringify(updatedWorkflows));
+        useStore.getState().syncWorkflowsToServer();
       } catch (error) {
-        console.error('Failed to update workflow name in localStorage:', error);
+        console.error('Failed to sync workflow name to server:', error);
       }
     }
   };
 
-  // Save workflow
+  // Save workflow – ensures the current canvas state is reflected in the
+  // active workflow and synced to MongoDB via the backend.
   const handleSaveWorkflow = () => {
     try {
       const nameToUse = workflowName || 'My Workflow';
-
-      const workflow = {
-        name: workflowName,
-        description: 'File transfer workflow',
-        nodes: canvasNodes,
-        connections: canvasConnections,
-        canvasPosition,
-        canvasZoom,
-        version: '1.0',
-        savedAt: new Date().toISOString()
-      };
-
-      // Save to localStorage
-      const savedWorkflows = JSON.parse(localStorage.getItem('sureroute_workflows') || '[]');
-      savedWorkflows.push(workflow);
-      localStorage.setItem('sureroute_workflows', JSON.stringify(savedWorkflows));
-
-      // Also add to Zustand store for immediate display
       if (activeWorkflowId) {
-        // Update existing workflow
         updateWorkflow(activeWorkflowId, {
           name: nameToUse,
           nodes: canvasNodes,
           connections: canvasConnections,
+          canvasPosition,
+          canvasZoom,
         });
-        alert('Workflow updated successfully!');
       } else {
-        // Create new workflow in store
-        createWorkflow(nameToUse, 'File transfer workflow');
-        alert('Workflow saved successfully!');
+        const newId = createWorkflow(nameToUse, 'File transfer workflow');
+        // Ensure new workflow has the current canvas state
+        updateWorkflow(newId, {
+          nodes: canvasNodes,
+          connections: canvasConnections,
+          canvasPosition,
+          canvasZoom,
+        });
       }
-      
-      console.log('✅ Workflow saved:', workflow);
+
+      // Ask store to persist to backend for logged-in users
+      try {
+        useStore.getState().syncWorkflowsToServer();
+      } catch (err) {
+        console.error('Failed to sync workflow to server:', err);
+      }
+
+      alert('Workflow saved successfully!');
     } catch (error) {
       console.error('Failed to save workflow:', error);
       alert('Failed to save workflow: ' + error.message);

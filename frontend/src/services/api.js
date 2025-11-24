@@ -2,7 +2,46 @@ import axios from 'axios';
 
 const API_BASE = 'http://localhost:5000/api';
 
+export const setAuthToken = (token) => {
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete axios.defaults.headers.common.Authorization;
+  }
+};
+
 export const api = {
+  // Auth operations
+  async signup(email, password) {
+    const response = await axios.post(`${API_BASE}/auth/signup`, { email, password });
+    return response.data;
+  },
+
+  async login(email, password) {
+    const response = await axios.post(`${API_BASE}/auth/login`, { email, password });
+    return response.data;
+  },
+
+  async getCurrentUser() {
+    const response = await axios.get(`${API_BASE}/auth/me`);
+    return response.data;
+  },
+
+  async logout() {
+    const response = await axios.post(`${API_BASE}/auth/logout`);
+    return response.data;
+  },
+
+  async getWorkflows() {
+    const response = await axios.get(`${API_BASE}/workflows`);
+    return response.data;
+  },
+
+  async saveWorkflows(workflows) {
+    const response = await axios.post(`${API_BASE}/workflows`, { workflows });
+    return response.data;
+  },
+
   // Transfer operations
   async createTransfer(manifest) {
     const response = await axios.post(`${API_BASE}/transfer/create`, manifest);

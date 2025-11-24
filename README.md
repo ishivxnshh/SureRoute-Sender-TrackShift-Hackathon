@@ -88,6 +88,117 @@ npm run dev:frontend
 
 Navigate to **http://localhost:3000** in your browser.
 
+## 🔐 Google OAuth 2.0 Authentication
+
+SureRoute supports login with **Google OAuth 2.0**, but once a user is verified by Google we
+switch to **our own JWT-based auth**. This keeps Google out of the hot path for every request
+while still giving you a simple “Sign in with Google” UX.
+
+### Backend OAuth Architecture
+
+- **Routes**
+  - `GET /auth/google`  
+    Redirects the browser to the Google OAuth 2.0 consent screen.
+  - `GET /auth/google/callback`  
+    Google redirects back here with `?code=...`. The backend:
+    1. Exchanges the code for `access_token` + `id_token`.
+    2. Decodes the `id_token` to get the Google profile (sub, email, name, picture).
+    3. Upserts the user into our JSON “database” (`storage/users.json`) with fields:
+       - `oauth_provider` (`google`)
+       - `oauth_id` (Google `sub`)
+       - `name`
+       - `email`
+       - `profile_image`
+       - `created_at` / `updated_at`
+    4. Generates a **SureRoute JWT** and redirects to the frontend with  
+       `/?authToken=<our-jwt>`.
+
+- **Where user info is stored**
+  - Backend keeps users in `storage/users.json` via the `models/user.js` model
+    (in a real deployment this would be a proper DB).
+  - We **do not** persist Google access/refresh tokens; we only store the identity
+    fields we need to recognise the user later.
+
+- **Why we store users in our own DB**
+  - Lets SureRoute have a stable internal user ID (`id`) regardless of auth provider.
+  - Enables additional auth methods (email/password, future providers) with a unified model.
+  - Keeps all app-level permissions, settings and workflows under our control instead
+    of round-tripping to Google.
+
+- **Session / JWT**
+  - JWTs are created by `backend/src/utils/jwt.js` with:
+    - `sub`: internal SureRoute user ID
+    - `email`
+    - `provider` (`google` or `local`)
+  - Protected routes (`/api/workflows`, `/api/auth/me`, `/auth/me`) use
+    `authMiddleware` to verify the JWT on every request.
+
+### Required Environment Variables
+
+Create `backend/.env` with:
+
+```bash
+GOOGLE_CLIENT_ID=<your-google-client-id>
+GOOGLE_CLIENT_SECRET=<your-google-client-secret>
+GOOGLE_REDIRECT_URI=http://localhost:5000/auth/google/callback
+
+FRONTEND_BASE_URL=http://localhost:3000
+
+JWT_SECRET=change-this-to-a-long-random-string
+JWT_EXPIRES_IN=7d
+```
+
+> Never commit real secrets to Git. Keep `.env` excluded via `.gitignore`.
+
+### Frontend OAuth Flow
+
+- On the **Home** page login card there is a **“Continue with Google”** button.
+  - Clicking it sends the browser to `http://localhost:5000/auth/google`.
+- After successful Google login, the backend redirects back to the frontend:
+  - `http://localhost:3000/?authToken=<sureRouteJwt>`
+- `frontend/src/main.jsx`:
+  - Reads `authToken` from the URL query string on first load.
+  - Calls `useStore().setAuthFromToken(token)` which:
+    1. Sets the `Authorization: Bearer <token>` header for Axios.
+    2. Calls `/api/auth/me` to fetch the current user.
+    3. Stores the user + token in the global store and loads that user’s workflows.
+  - Cleans `authToken` from the URL using `history.replaceState` so it does not stay
+    in the address bar or browser history.
+
+### Google Cloud Console Setup
+
+1. Go to **Google Cloud Console** and create (or select) a project.
+2. Navigate to **APIs & Services → Credentials**.
+3. Click **Create Credentials → OAuth client ID**.
+4. Choose **Web application** and set:
+   - **Authorized JavaScript origins**
+     - `http://localhost:3000`
+   - **Authorized redirect URIs**
+     - `http://localhost:5000/auth/google/callback`
+5. Save and copy the **Client ID** and **Client Secret** into `backend/.env`.
+
+### Testing the OAuth Flow Locally
+
+1. **Start the backend**
+   ```bash
+   cd backend
+   npm install        # ensure dotenv + jsonwebtoken are installed
+   npm run dev
+   ```
+2. **Start the frontend**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+3. Open `http://localhost:3000` in your browser.
+4. In the login card on the Home page, click **“Continue with Google”**.
+5. Complete the Google sign-in:
+   - You should be redirected back to the SureRoute UI.
+   - The header chip will show you as logged in with your Google email.
+   - Any workflows you create are now associated with your SureRoute user record.
+
+
 ## 🎯 Demo Script (3-Minute Judge Presentation)
 
 ### Setup (30 seconds)
