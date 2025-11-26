@@ -269,10 +269,6 @@ function HomePage() {
                 ? 'Create your first file transfer workflow to get started.'
                 : 'Start building a workflow as a guest. To save it to your profile for later, create an account or log in.'}
             </p>
-            <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
-              <Plus size={20} />
-              Create Workflow
-            </button>
           </div>
         ) : (
           <div className="workflows-grid">

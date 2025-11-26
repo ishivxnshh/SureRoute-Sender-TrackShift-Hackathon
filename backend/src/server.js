@@ -15,6 +15,7 @@ import { BluetoothManager } from './bluetooth-manager.js';
 import { authMiddleware } from './utils/jwt.js';
 import { getUserWorkflows, saveUserWorkflows } from './workflows.js';
 import { signup, login, me, logout, startGoogleOAuth, handleGoogleCallback } from './controllers/authController.js';
+import { getDb } from './db/mongo.js';
 
 dotenv.config();
 
@@ -1287,12 +1288,31 @@ async function processTransferQueue() {
 }
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ SureRoute Backend running on port ${PORT}`);
-  console.log(`📂 Storage directory: ${STORAGE_DIR}`);
-  console.log(`🔗 P2P Manager: ${p2pManager.localPeerId.substring(0, 8)}...`);
-  console.log(`📱 Bluetooth: ${bluetoothManager.isAvailable() ? 'Available' : 'Unavailable'}`);
-});
+
+// Initialize MongoDB at startup so we fail fast if DB config is wrong.
+(async () => {
+  try {
+    console.log('[Startup] Initializing MongoDB connection...');
+    await getDb();
+    console.log('[Startup] MongoDB connection ready.');
+  } catch (err) {
+    console.error(
+      '[Startup] MongoDB connection failed. Auth endpoints will not work until this is fixed.',
+      err,
+    );
+  }
+
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ SureRoute Backend running on port ${PORT}`);
+    console.log(`📂 Storage directory: ${STORAGE_DIR}`);
+    console.log(
+      `🔗 P2P Manager: ${p2pManager.localPeerId.substring(0, 8)}...`,
+    );
+    console.log(
+      `📱 Bluetooth: ${bluetoothManager.isAvailable() ? 'Available' : 'Unavailable'}`,
+    );
+  });
+})();
 
 // Cleanup on shutdown
 process.on('SIGINT', async () => {
