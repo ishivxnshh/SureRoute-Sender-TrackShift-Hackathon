@@ -3,6 +3,7 @@
   height: 100vh;
   background: var(--bg-secondary);
   overflow-y: auto;
+  position: relative;
 }
 
 .home-header {
@@ -12,6 +13,15 @@
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.three-background {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.17;
+  mix-blend-mode: screen;
+  z-index: -1; /* Always sit behind header, auth card, and workflows */
 }
 
 .home-header-content {
@@ -42,6 +52,201 @@
 .home-title-section p {
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+/* Auth section */
+.auth-section {
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px 8px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-primary);
+  border-radius: 16px;
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-md);
+  padding: 20px 22px 18px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.auth-header h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.auth-header p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.auth-tabs {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-secondary);
+  margin: 16px 0 18px;
+}
+
+.auth-tab {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+.auth-tab.active {
+  background: var(--accent-primary);
+  color: #ffffff;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-input-group {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border-radius: 999px;
+  border: 1px solid var(--border-primary);
+  padding: 0 10px;
+  gap: 6px;
+}
+
+.auth-input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+}
+
+.auth-input-group input {
+  border: none;
+  background: transparent;
+  padding: 8px 4px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.auth-input-toggle {
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  padding: 4px;
+}
+
+.auth-input-toggle:hover {
+  color: var(--text-primary);
+}
+
+.auth-error {
+  font-size: 12px;
+  color: var(--error);
+  background: rgba(248, 113, 113, 0.06);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.auth-submit-btn {
+  margin-top: 4px;
+  justify-content: center;
+}
+
+.auth-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  animation: spin 0.7s linear infinite;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 8px 0 4px;
+}
+
+.auth-divider span:first-child,
+.auth-divider span:last-child {
+  flex: 1;
+  height: 1px;
+  background: var(--border-secondary);
+}
+
+.auth-google-btn {
+  width: 100%;
+  border-radius: 999px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-secondary);
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.auth-google-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+.auth-google-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+.auth-footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auth-mode-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.auth-mode-toggle button {
+  border: none;
+  background: transparent;
+  color: var(--accent-primary);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.auth-guest-hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
 }
 
 /* Workflows Container */
@@ -370,4 +575,24 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .home-header {
+    padding: 16px;
+  }
+
+  .home-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .workflows-container {
+    padding: 20px 16px 32px;
+  }
+
+  .auth-card {
+    padding: 18px 16px 16px;
+  }
 }

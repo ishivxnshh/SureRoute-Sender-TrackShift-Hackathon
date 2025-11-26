@@ -12,6 +12,11 @@
   "dependencies": {
     "axios": "^1.4.0",
     "lucide-react": "^0.263.1",
+    "framer-motion": "^11.0.0",
+    "@radix-ui/react-tooltip": "^1.1.2",
+    "three": "^0.169.0",
+    "@react-three/fiber": "^8.15.16",
+    "@react-three/drei": "^9.86.4",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",

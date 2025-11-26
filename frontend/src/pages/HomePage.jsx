@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
-import { Plus, Folder, Clock, Trash2, Edit2 } from 'lucide-react';
+import {
+  Plus,
+  Folder,
+  Clock,
+  Trash2,
+  Edit2,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
 import './HomePage.css';
+import ThreeBackground from '../components/ThreeBackground';
+import AnimatedCard from '../components/AnimatedCard';
 
 const BACKEND_BASE =
   import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:5000';
@@ -12,6 +24,7 @@ function HomePage() {
     createWorkflow, 
     deleteWorkflow, 
     setActiveWorkflow, 
+    setCurrentView,
     theme, 
     toggleTheme,
     user,
@@ -28,6 +41,7 @@ function HomePage() {
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleCreateWorkflow = () => {
     if (newWorkflowName.trim()) {
@@ -62,6 +76,7 @@ function HomePage() {
 
   return (
     <div className="home-page">
+      <ThreeBackground />
       {/* Header */}
       <div className="home-header">
         <div className="home-header-content">
@@ -119,143 +134,183 @@ function HomePage() {
             >
               {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
             </button>
-            <button 
-              className="btn-primary" 
-              onClick={() => setShowCreateModal(true)}
-            >
-              <Plus size={20} />
-              New Workflow
-            </button>
+            {user ? (
+              <button 
+                className="btn-primary" 
+                onClick={() => setShowCreateModal(true)}
+              >
+                <Plus size={20} />
+                New Workflow
+              </button>
+            ) : (
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  if (workflows && workflows.length > 0) {
+                    setActiveWorkflow(workflows[0].id);
+                  } else {
+                    createWorkflow('Guest Workflow', 'Explore SureRoute as a guest');
+                  }
+                  setCurrentView('workflow');
+                }}
+              >
+                Enter as guest
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       {/* Auth card when not logged in */}
       {!user && (
-        <div
-          style={{
-            maxWidth: '420px',
-            margin: '0 auto 24px',
-            padding: '20px 24px',
-            borderRadius: '16px',
-            background: 'var(--card-bg)',
-            boxShadow: 'var(--shadow-md)',
-          }}
-        >
-          <h2 style={{ margin: '0 0 12px', fontSize: '18px' }}>
-            {authMode === 'login' ? 'Log in to save your workflows' : 'Create an account'}
-          </h2>
-          <p style={{ margin: '0 0 16px', fontSize: '13px', opacity: 0.8 }}>
-            You can build workflows as a guest, but they will only be saved to your profile and available across sessions once you log in or create an account.
-          </p>
-          <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-              />
+        <section className="auth-section">
+          <AnimatedCard>
+            <div className="auth-card">
+              <div className="auth-header">
+              <h2>
+                {authMode === 'login'
+                  ? 'Welcome back to SureRoute'
+                  : 'Create your SureRoute account'}
+              </h2>
+              <p>
+                Design workflows as a guest, or sign in to sync them across devices
+                and keep your presets safe.
+              </p>
             </div>
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            {authError && (
-              <div
-                style={{
-                  fontSize: '12px',
-                  color: '#ff6b6b',
-                  marginTop: '4px',
-                }}
-              >
-                {authError}
-              </div>
-            )}
-            <button
-              className="btn-primary"
-              type="submit"
-              disabled={isAuthLoading}
-              style={{ marginTop: '8px' }}
-            >
-              {isAuthLoading
-                ? authMode === 'login'
-                  ? 'Logging in...'
-                  : 'Signing up...'
-                : authMode === 'login'
-                ? 'Log In'
-                : 'Sign Up'}
-            </button>
-            <div
-              style={{
-                marginTop: '10px',
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
+
+            <div className="auth-tabs">
               <button
                 type="button"
+                className={`auth-tab ${authMode === 'login' ? 'active' : ''}`}
+                onClick={() => setAuthMode('login')}
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                className={`auth-tab ${authMode === 'signup' ? 'active' : ''}`}
+                onClick={() => setAuthMode('signup')}
+              >
+                Sign up
+              </button>
+            </div>
+
+            <form className="auth-form" onSubmit={handleAuthSubmit}>
+              <div className="form-group">
+                <label>Email</label>
+                <div className="auth-input-group">
+                  <span className="auth-input-icon">
+                    <Mail size={16} />
+                  </span>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Password</label>
+                <div className="auth-input-group">
+                  <span className="auth-input-icon">
+                    <Lock size={16} />
+                  </span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={
+                      authMode === 'signup'
+                        ? 'At least 8 characters'
+                        : 'Your password'
+                    }
+                    required
+                    minLength={8}
+                  />
+                  <button
+                    type="button"
+                    className="auth-input-toggle"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {authError && (
+                <div className="auth-error">
+                  {authError}
+                </div>
+              )}
+
+              <button
+                className="btn-primary auth-submit-btn"
+                type="submit"
+                disabled={isAuthLoading}
+              >
+                {isAuthLoading ? (
+                  <span className="auth-loading">
+                    <span className="auth-spinner" />
+                    {authMode === 'login' ? 'Logging in…' : 'Creating account…'}
+                  </span>
+                ) : authMode === 'login' ? (
+                  'Log in'
+                ) : (
+                  'Sign up'
+                )}
+              </button>
+
+              <div className="auth-divider">
+                <span />
+                <span>or</span>
+                <span />
+              </div>
+
+              <button
+                type="button"
+                className="auth-google-btn"
                 onClick={() => {
                   window.location.href = `${BACKEND_BASE}/auth/google`;
-                }}
-                style={{
-                  borderRadius: '999px',
-                  padding: '8px 14px',
-                  border: '1px solid var(--border-subtle)',
-                  background: 'var(--bg-elevated)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '13px',
-                  cursor: 'pointer',
                 }}
               >
                 <img
                   src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                   alt="Google logo"
-                  style={{ width: 16, height: 16 }}
                 />
                 <span>Continue with Google</span>
               </button>
+            </form>
+
+            <div className="auth-footer">
+              <div className="auth-mode-toggle">
+                <span>
+                  {authMode === 'login'
+                    ? "Don't have an account?"
+                    : 'Already have an account?'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAuthMode((prev) =>
+                      prev === 'login' ? 'signup' : 'login'
+                    )
+                  }
+                >
+                  {authMode === 'login' ? 'Sign up' : 'Log in'}
+                </button>
+              </div>
+              <p className="auth-guest-hint">
+                You can still explore and build workflows as a guest – they’ll
+                stay in this browser until you clear your data.
+              </p>
             </div>
-          </form>
-          <div
-            style={{
-              marginTop: '10px',
-              fontSize: '12px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <span>
-              {authMode === 'login' ? "Don't have an account?" : 'Already have an account?'}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                setAuthMode((prev) => (prev === 'login' ? 'signup' : 'login'))
-              }
-              style={{
-                border: 'none',
-                background: 'transparent',
-                color: 'var(--accent-primary)',
-                cursor: 'pointer',
-                fontWeight: 500,
-              }}
-            >
-              {authMode === 'login' ? 'Sign up' : 'Log in'}
-            </button>
           </div>
-        </div>
+          </AnimatedCard>
+        </section>
       )}
 
       {/* Workflows Grid */}

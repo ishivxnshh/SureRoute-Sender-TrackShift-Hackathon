@@ -1,20 +1,9 @@
 import { create } from 'zustand';
 import { api, setAuthToken } from './services/api';
 
-// Initialize with a single default workflow; once a user logs in we replace
-// this list with workflows loaded from MongoDB via the backend.
-const initialWorkflows = [
-  {
-    id: 'wf_default_ab',
-    name: 'A-B Transfer',
-    description: 'Simple file transfer workflow from sender (A) to receiver (B)',
-    nodes: [],
-    connections: [],
-    status: 'idle',
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  },
-];
+// Start with no pre-made workflows; everything visible is either created by
+// the user or loaded from the backend for that account.
+const initialWorkflows = [];
 
 export const useStore = create((set, get) => ({
   // Auth
@@ -94,6 +83,13 @@ export const useStore = create((set, get) => ({
       user: null,
       authToken: null,
       authError: null,
+      // Clear any user-specific workflows and reset view to a clean guest state
+      workflows: initialWorkflows,
+      activeWorkflowId: null,
+      canvasNodes: [],
+      canvasConnections: [],
+      selectedNodeId: null,
+      currentView: 'home',
     });
   },
 
