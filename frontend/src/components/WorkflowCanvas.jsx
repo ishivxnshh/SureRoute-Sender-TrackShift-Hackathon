@@ -323,10 +323,21 @@ const WorkflowCanvas = () => {
   const handleExecute = async () => {
     try {
       // Find required nodes
-      const senderNode = canvasNodes.find(n => n.type === 'device' && n.config?.deviceType === 'sender');
-      const receiverNode = canvasNodes.find(n => n.type === 'device' && n.config?.deviceType === 'receiver');
-      const fileSourceNode = canvasNodes.find(n => n.type === 'file-source');
-      const transportNode = canvasNodes.find(n => n.type.includes('transport'));
+      const senderNode = canvasNodes.find(
+        (n) => n.type === 'device' && n.config?.deviceType === 'sender'
+      );
+      const receiverNode = canvasNodes.find(
+        (n) => n.type === 'device' && n.config?.deviceType === 'receiver'
+      );
+      const fileSourceNode = canvasNodes.find((n) => n.type === 'file-source');
+
+      // Transport selection – support both WiFi and Relay transport nodes
+      // Node types come from NodeSidebar where ids are:
+      //   - 'relay-server'   → Relay transport
+      //   - 'wifi-transfer'  → Direct WiFi transport
+      const transportNode = canvasNodes.find(
+        (n) => n.type === 'relay-server' || n.type === 'wifi-transfer'
+      );
       
       if (!senderNode || !receiverNode) {
         alert('Workflow must have both Sender and Receiver device nodes!');

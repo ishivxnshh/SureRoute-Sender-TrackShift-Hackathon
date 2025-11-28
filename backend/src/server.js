@@ -992,6 +992,23 @@ async function transferViaRelay(transferId, fileBuffer, fileName, totalChunks, c
       if (response.ok) {
         const transfer = transfers.get(transferId);
         transfer.completedChunks = i + 1;
+        // Ensure basic transfer stats exist
+        transfer.status = transfer.status || 'active';
+        transfer.startedAt = transfer.startedAt || transfer.startTime || Date.now();
+
+        // Compute progress + speed + ETA for UI footer metrics
+        const completedChunks = transfer.completedChunks;
+        const progress = completedChunks / totalChunks;
+        const elapsedSeconds = (Date.now() - transfer.startedAt) / 1000;
+        const bytesTransferred = completedChunks * chunkSize;
+        const speed = elapsedSeconds > 0 ? bytesTransferred / elapsedSeconds : 0;
+        const remainingChunks = totalChunks - completedChunks;
+        const eta =
+          speed > 0 ? (remainingChunks * chunkSize) / speed : null;
+
+        transfer.progress = progress;
+        transfer.speed = speed;
+        transfer.eta = eta;
         transfers.set(transferId, transfer);
 
         // Priority-based pacing for relay, same tiers as WiFi
@@ -1015,6 +1032,15 @@ async function transferViaRelay(transferId, fileBuffer, fileName, totalChunks, c
         if (delayMs > 0) {
           await new Promise((resolve) => setTimeout(resolve, delayMs));
         }
+
+        // Emit standardized update event used by the frontend footer
+        io.emit('transfer:update', {
+          transfer_id: transferId,
+          progress,
+          speed_bytes_s: speed,
+          eta,
+          status: transfer.status,
+        });
 
         io.emit('transfer-progress', {
           transferId,
@@ -1148,6 +1174,22 @@ async function transferViaWiFi(transferId, fileBuffer, fileName, receiverIP, rec
 
     const transfer = transfers.get(transferId);
     transfer.completedChunks = i + 1;
+    transfer.status = transfer.status || 'active';
+    transfer.startedAt = transfer.startedAt || transfer.startTime || Date.now();
+
+    // Compute progress + speed + ETA similar to the chunked upload endpoint
+    const completedChunks = transfer.completedChunks;
+    const progress = completedChunks / totalChunks;
+    const elapsedSeconds = (Date.now() - transfer.startedAt) / 1000;
+    const bytesTransferred = completedChunks * chunkSize;
+    const speed = elapsedSeconds > 0 ? bytesTransferred / elapsedSeconds : 0;
+    const remainingChunks = totalChunks - completedChunks;
+    const eta =
+      speed > 0 ? (remainingChunks * chunkSize) / speed : null;
+
+    transfer.progress = progress;
+    transfer.speed = speed;
+    transfer.eta = eta;
     transfers.set(transferId, transfer);
 
     // Priority-based pacing: strong differentiation between levels
@@ -1172,7 +1214,16 @@ async function transferViaWiFi(transferId, fileBuffer, fileName, receiverIP, rec
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
 
-    // Send progress to all connected UIs
+    // Emit standardized update event used by the frontend footer
+    io.emit('transfer:update', {
+      transfer_id: transferId,
+      progress,
+      speed_bytes_s: speed,
+      eta,
+      status: transfer.status,
+    });
+
+    // Send progress to all connected UIs (legacy event used for logs)
     const progressData = {
       transferId,
       progress: ((i + 1) / totalChunks) * 100,

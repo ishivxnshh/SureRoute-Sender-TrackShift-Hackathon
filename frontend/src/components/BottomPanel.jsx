@@ -68,7 +68,9 @@ const BottomPanel = () => {
   };
 
   const getSuccessRate = () => {
-    const completed = transfers.filter(t => t.status === 'complete').length;
+    const completed = transfers.filter(t => 
+      t.status === 'complete' || t.status === 'completed' || t.status === 'success'
+    ).length;
     const total = transfers.length;
     return total > 0 ? (completed / total * 100).toFixed(1) : 0;
   };
