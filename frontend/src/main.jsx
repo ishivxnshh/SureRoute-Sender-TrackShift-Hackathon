@@ -9,8 +9,13 @@ import { useStore } from './store';
 // our OWN JWT after a successful Google OAuth redirect.
 function Root() {
   const setAuthFromToken = useStore((state) => state.setAuthFromToken);
+  const initAuth = useStore((state) => state.initAuth);
 
   useEffect(() => {
+    // First, try to restore auth from localStorage
+    initAuth();
+
+    // Then check for OAuth callback token in URL
     const url = new URL(window.location.href);
     const token = url.searchParams.get('authToken');
     if (token) {
@@ -22,7 +27,7 @@ function Root() {
         url.origin + url.pathname + (url.search ? `?${url.searchParams}` : '') + url.hash;
       window.history.replaceState({}, '', cleaned);
     }
-  }, [setAuthFromToken]);
+  }, [setAuthFromToken, initAuth]);
 
   return (
     <React.StrictMode>

@@ -12,6 +12,14 @@ export const useStore = create((set, get) => ({
   authError: null,
   isAuthLoading: false,
 
+  // Initialize auth from localStorage
+  initAuth: async () => {
+    const token = localStorage.getItem('sureroute_auth_token');
+    if (token) {
+      await get().setAuthFromToken(token);
+    }
+  },
+
   // Used when the app is loaded with ?authToken=... after Google OAuth
   setAuthFromToken: async (token) => {
     if (!token) return;
@@ -22,6 +30,7 @@ export const useStore = create((set, get) => ({
         set({
           user: data.user,
           authToken: token,
+          currentView: 'landing', // Stay on landing to show workflows
         });
         await get().loadUserWorkflows();
       }
@@ -42,13 +51,16 @@ export const useStore = create((set, get) => ({
         user: data.user,
         authToken: data.token,
         isAuthLoading: false,
+        currentView: 'home', // Navigate to home to show workflow list
       });
       // Load any existing workflows for this user
       await get().loadUserWorkflows();
+      return true;
     } catch (error) {
       console.error('Signup failed:', error);
       const message = error?.response?.data?.error || 'Failed to sign up';
       set({ authError: message, isAuthLoading: false });
+      return false;
     }
   },
 
@@ -63,12 +75,15 @@ export const useStore = create((set, get) => ({
         user: data.user,
         authToken: data.token,
         isAuthLoading: false,
+        currentView: 'home', // Navigate to home to show workflow list
       });
       await get().loadUserWorkflows();
+      return true;
     } catch (error) {
       console.error('Login failed:', error);
       const message = error?.response?.data?.error || 'Failed to log in';
       set({ authError: message, isAuthLoading: false });
+      return false;
     }
   },
 
@@ -89,7 +104,7 @@ export const useStore = create((set, get) => ({
       canvasNodes: [],
       canvasConnections: [],
       selectedNodeId: null,
-      currentView: 'home',
+      currentView: 'landing', // Return to landing page after logout
     });
   },
 
@@ -124,7 +139,7 @@ export const useStore = create((set, get) => ({
   },
 
   // View mode
-  currentView: 'home', // 'home' or 'workflow'
+  currentView: 'landing', // 'landing', 'home', or 'workflow'
   setCurrentView: (view) => set({ currentView: view }),
 
   // Workflows (Projects)

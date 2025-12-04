@@ -105,7 +105,7 @@ const TopBar = () => {
   return (
     <div className="top-bar">
       <div className="top-bar-left">
-        <button className="home-btn" onClick={() => setCurrentView('home')} title="Back to Home">
+        <button className="home-btn" onClick={() => setCurrentView('landing')} title="Back to Workflows">
           <Home size={20} />
         </button>
         <div className="project-name">

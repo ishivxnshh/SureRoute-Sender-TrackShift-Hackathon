@@ -1,71 +1,97 @@
 :root {
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-/* Dark Theme (Default) */
-:root, :root[data-theme="dark"] {
-  --bg-primary: #0f0f0f;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #262626;
-  --bg-canvas: #0a0a0a;
-  
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
-  
-  --border-primary: #2d2d2d;
-  --border-secondary: #3d3d3d;
-  
-  --accent-primary: #818cf8;
-  --accent-secondary: #6366f1;
-  --accent-hover: #4f46e5;
-  
-  --success: #34d399;
-  --warning: #fbbf24;
-  --error: #f87171;
-  --info: #60a5fa;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
-  
-  --node-bg: #1a1a1a;
-  --node-border: #2d2d2d;
-  --node-hover: #262626;
-  --node-selected: #312e81;
+/* Dark Theme (Haas F1 - TrackShift) */
+:root,
+:root[data-theme="dark"] {
+  --font-primary: 'Titillium Web', sans-serif;
+  --font-display: 'Orbitron', sans-serif;
+
+  /* Haas F1 Palette */
+  --haas-red: #E6002B;
+  --haas-white: #FFFFFF;
+  --haas-black: #15151E;
+  --haas-grey: #7B868C;
+
+  /* Functional Colors */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #15151E;
+  --bg-tertiary: #1e1e2a;
+  --bg-canvas: #0a0a0f;
+  --bg-glass: rgba(21, 21, 30, 0.95);
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B0B0;
+  --text-tertiary: #7B868C;
+  --text-accent: #E6002B;
+
+  --border-primary: #333333;
+  --border-secondary: #444444;
+  --border-accent: #E6002B;
+
+  --accent-primary: #E6002B;
+  --accent-secondary: #ff1a47;
+  --accent-hover: #cc0026;
+
+  --success: #00D2BE;
+  --warning: #FFD700;
+  --error: #E6002B;
+  --info: #00A0E3;
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.8);
+
+  --node-bg: #15151E;
+  --node-border: #333333;
+  --node-hover: #1e1e2a;
+  --node-selected: #E6002B;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
 }
 
-/* Light Theme */
+/* Light Theme (Clean Racing) */
 :root[data-theme="light"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --bg-canvas: #fafafa;
-  
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  
-  --border-primary: #e5e7eb;
-  --border-secondary: #d1d5db;
-  
-  --accent-primary: #6366f1;
-  --accent-secondary: #4f46e5;
-  --accent-hover: #4338ca;
-  
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  
+  --font-primary: 'Titillium Web', sans-serif;
+  --font-display: 'Orbitron', sans-serif;
+
+  --haas-red: #E6002B;
+
+  --bg-primary: #f0f2f5;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e4e6eb;
+  --bg-canvas: #f0f2f5;
+  --bg-glass: rgba(255, 255, 255, 0.95);
+
+  --text-primary: #1c1e21;
+  --text-secondary: #606770;
+  --text-tertiary: #8d949e;
+  --text-accent: #E6002B;
+
+  --border-primary: #dddfe2;
+  --border-secondary: #ccd0d5;
+  --border-accent: #E6002B;
+
+  --accent-primary: #E6002B;
+  --accent-secondary: #cc0026;
+  --accent-hover: #b3001e;
+
+  --success: #008a7c;
+  --warning: #d4b106;
+  --error: #E6002B;
+  --info: #0077a8;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
   --node-bg: #ffffff;
-  --node-border: #e5e7eb;
-  --node-hover: #f9fafb;
-  --node-selected: #eef2ff;
+  --node-border: #dddfe2;
+  --node-hover: #f0f2f5;
+  --node-selected: #E6002B;
 }
 
 * {
@@ -75,13 +101,13 @@
 }
 
 body {
-  font-family: var(--font-family);
+  font-family: var(--font-primary);
   background: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background 0.3s, color 0.3s;
-  overflow: hidden;
+  overflow: auto;
 }
 
 code {

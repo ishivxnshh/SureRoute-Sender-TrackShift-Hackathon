@@ -1,7 +1,7 @@
 .left-panel {
   width: 280px;
-  background: #0f1629;
-  border-right: 1px solid #2d3655;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-primary);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -9,7 +9,7 @@
 
 .panel-header {
   padding: 20px;
-  border-bottom: 1px solid #2d3655;
+  border-bottom: 1px solid var(--border-primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -18,8 +18,11 @@
 .panel-header h3 {
   font-size: 16px;
   font-weight: 600;
-  color: #e8eaed;
+  font-family: var(--font-display);
+  color: var(--text-primary);
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .btn-icon {
@@ -27,9 +30,9 @@
   height: 32px;
   padding: 0;
   background: transparent;
-  border: 1px solid #2d3655;
+  border: 1px solid var(--border-primary);
   border-radius: 6px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -38,9 +41,9 @@
 }
 
 .btn-icon:hover {
-  background: #1a1f3a;
-  border-color: #667eea;
-  color: #667eea;
+  background: var(--bg-tertiary);
+  border-color: var(--haas-red);
+  color: var(--haas-red);
 }
 
 .search-box {
@@ -49,22 +52,23 @@
 
 .search-box input {
   width: 100%;
-  background: #0a0e27;
-  border: 1px solid #2d3655;
-  color: #e8eaed;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 14px;
+  font-family: var(--font-primary);
   outline: none;
   transition: border-color 0.2s;
 }
 
 .search-box input:focus {
-  border-color: #667eea;
+  border-color: var(--haas-red);
 }
 
 .search-box input::placeholder {
-  color: #64748b;
+  color: var(--text-tertiary);
 }
 
 .components-list {
@@ -80,7 +84,8 @@
 .category-title {
   font-size: 12px;
   font-weight: 600;
-  color: #64748b;
+  font-family: var(--font-display);
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 12px;
@@ -91,8 +96,8 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #1a1f3a;
-  border: 1px solid #2d3655;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
   border-left: 3px solid;
   border-radius: 8px;
   margin-bottom: 8px;
@@ -101,9 +106,9 @@
 }
 
 .component-item:hover {
-  background: #1f2642;
+  background: var(--bg-primary);
   transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(230, 0, 43, 0.2);
 }
 
 .component-item.dragging {
@@ -117,7 +122,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(230, 0, 43, 0.1);
   border-radius: 6px;
 }
 
@@ -128,13 +133,14 @@
 .component-label {
   font-size: 14px;
   font-weight: 500;
-  color: #e8eaed;
+  font-family: var(--font-primary);
+  color: var(--text-primary);
   margin-bottom: 2px;
 }
 
 .component-hint {
   font-size: 11px;
-  color: #64748b;
+  color: var(--text-tertiary);
 }
 
 .quick-action-item {
@@ -142,7 +148,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: #1a1f3a;
+  background: var(--bg-tertiary);
   border: 1px solid #2d3655;
   border-radius: 6px;
   margin-bottom: 8px;

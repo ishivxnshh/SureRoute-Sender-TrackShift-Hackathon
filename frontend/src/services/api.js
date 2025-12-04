@@ -5,8 +5,10 @@ const API_BASE = 'http://localhost:5000/api';
 export const setAuthToken = (token) => {
   if (token) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    localStorage.setItem('sureroute_auth_token', token);
   } else {
     delete axios.defaults.headers.common.Authorization;
+    localStorage.removeItem('sureroute_auth_token');
   }
 };
 

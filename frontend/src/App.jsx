@@ -3,6 +3,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useStore } from './store';
 import websocket from './services/websocket';
+import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import WorkflowCanvas from './components/WorkflowCanvas';
 import TopBar from './components/TopBar';
@@ -108,10 +109,9 @@ function App() {
   // Render different views based on currentView
   console.log('Current View:', currentView);
   console.log('Theme:', theme);
-  
-  if (currentView === 'home') {
-    console.log('Rendering HomePage');
-    return <HomePage />;
+
+  if (currentView === 'landing') {
+    return <LandingPage />;
   }
 
   console.log('Rendering Workflow Editor');
@@ -124,6 +124,4 @@ function App() {
       </div>
     </DndProvider>
   );
-}
-
-export default App;
+}export default App;
