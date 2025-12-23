@@ -6,7 +6,7 @@ class WebSocketService {
     this.listeners = new Map();
   }
 
-  connect(url = 'http://localhost:5000') {
+  connect(url = import.meta.env.VITE_WS_URL || 'http://localhost:5000') {
     this.socket = io(url, {
       transports: ['websocket', 'polling'],
       reconnection: true,
