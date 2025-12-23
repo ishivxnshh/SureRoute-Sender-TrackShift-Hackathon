@@ -148,8 +148,16 @@ export async function handleGoogleCallback(req, res) {
 
     res.redirect(redirectUrl);
   } catch (err) {
-    console.error('Google OAuth callback error:', err);
-    res.status(500).send('Google OAuth failed');
+    // Log full stack for debugging
+    console.error('Google OAuth callback error:', err && err.stack ? err.stack : err);
+
+    // In development, return the error message to help debugging in the browser.
+    if (process.env.NODE_ENV !== 'production') {
+      const msg = typeof err === 'string' ? err : (err && err.message) ? err.message : 'Unknown error';
+      res.status(500).send(`Google OAuth failed: ${msg}`);
+    } else {
+      res.status(500).send('Google OAuth failed');
+    }
   }
 }
 
